@@ -1,10 +1,8 @@
 @echo off
-title Resource Allocation Simulator - Banker's Algorithm & DFRR
+title Resource Allocation Simulator - Banker's Algorithm
 echo =====================================================================
-echo   RESOURCE ALLOCATION SIMULATOR - DEADLOCK AVOIDANCE
-echo   Operating Systems SLA Project (SYCM3, Semester III)
-echo   Students: Yash Khapre & Aman Kumar
-echo   Shah & Anchor Kutchhi Engineering College
+echo   RESOURCE ALLOCATION SIMULATOR - BANKER'S ALGORITHM
+echo   Deadlock Avoidance Interactive Simulator
 echo =====================================================================
 echo.
 

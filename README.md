@@ -1,234 +1,121 @@
-# Resource Allocation Simulator: Deadlock Avoidance Using Banker's Algorithm with Research-Based Resource Reservation
+# Resource Allocation Simulator — Banker's Algorithm
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.40%2B-FF4B4B.svg)](https://streamlit.io/)
-[![Pytest](https://img.shields.io/badge/Pytest-Passed%20(24%2F24)-success.svg)](https://docs.pytest.org/)
+[![Pytest](https://img.shields.io/badge/Pytest-Passed-success.svg)](https://docs.pytest.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
----
-
-## Academic Project Details
-- **Project Title**: Resource Allocation Simulator – Deadlock Avoidance using Banker’s Algorithm
-- **Course**: Operating System (Course Code: CSC303 / SLA-2)
-- **Department**: Department of Computer Engineering
-- **Institution**: Shah & Anchor Kutchhi Engineering College (Autonomous Institute Affiliated to University of Mumbai)
-- **Class**: SYCM3 | **Semester**: III | **Academic Year**: 2026–2027
-- **Students**:
-  - **Yash Khapre** (PRN: `125BTCM1149`, Roll No: `25`)
-  - **Aman Kumar** (PRN: `125BTCM1092`, Roll No: `26`)
-- **Faculty Guide**: **Mrs. Vaishali Kosambkar**
-- **SDG Mapping**:
-  - **Primary**: SDG 9 — Industry, Innovation and Infrastructure
-  - **Secondary**: SDG 4 — Quality Education
+An interactive, responsive single-page web simulator implementing **Dijkstra's Banker's Algorithm** for deadlock avoidance in operating systems. Designed with a clean two-column dashboard layout modeled directly after academic Operating Systems system specifications.
 
 ---
 
-## 1. Project Overview & Problem Statement
+## 1. Overview & Operating Principle
 
-In multitasking computer operating systems, multiple concurrently executing processes compete for a shared finite set of physical resources (such as CPU cores, memory pages, tape drives, printers, and disk I/O channels). If resources are allocated blindly without forward-looking safety checks, a circular dependency may form where every process waits for resources held by another process—a catastrophic condition known as **deadlock**.
+In multitasking operating systems, multiple concurrently executing processes compete for a shared finite set of resources (CPU, memory, devices). Granting resource claims without forward-looking checks can push the system into an **unsafe state**, leading to circular wait and **deadlock**.
 
-This project provides a complete, modern, interactive **Resource Allocation Simulator** implementing:
-1. **Dijkstra's Classic Banker's Algorithm** for centralized deadlock avoidance.
-2. **On-Demand Resource-Request Simulation** with automated tentative state verification and safe rollback.
-3. An experimental research-inspired extension: **Deadlock-Free Resource Reservation (DFRR)** based on *Botlagunta, Agrawal & Rao (2022)*.
-4. **Step-by-step educational visualization**, execution timers, operation counters, and comprehensive automated test suites.
+The **Banker's Algorithm** avoids deadlock by simulating hypothetical process completion:
+1. **Need Matrix Calculation**: 
+   $$\text{Need}[i][j] = \text{Maximum}[i][j] - \text{Allocation}[i][j]$$
+2. **Safety Check**:
+   - Initializes $\text{Work} = \text{Available}$ and $\text{Finish}[i] = \text{False}$.
+   - Finds an unfinished process $P_i$ whose $\text{Need}[i] \le \text{Work}$ across all resource types.
+   - Simulates process $P_i$ completing and releasing its allocated resources:
+     $$\text{Work} = \text{Work} + \text{Allocation}[i]$$
+   - Marks $P_i$ as finished and repeats until all processes complete (**SAFE**) or no eligible process remains (**UNSAFE**).
 
 ---
 
-## 2. Key Objectives & Features
+## 2. Interface Components (Two-Column Layout)
 
-- **Input Validation Suite (Rules V1–V7)**: Enforces dimensions, non-negativity, numeric integrity, $\text{Allocation} \le \text{Maximum}$, and total capacity limits.
-- **Automated Need Matrix Computation**: Automatically computes $\text{Need} = \text{Maximum} - \text{Allocation}$.
-- **Safety Algorithm & Safe-Sequence Generation**:
-  - Deterministic tie-breaking (lowest index first, conforming to SLA-2 specifications).
-  - Highlighting of Work vector growth as completed processes release held allocations.
-  - Backtracking DFS engine to discover and display **all alternative valid safe sequences**.
-- **Interactive Stepper**: Step through algorithm execution with *Previous*, *Next*, *Reset*, and *Slider* controls.
-- **Resource Request Engine**:
-  - Validates $\text{Request} \le \text{Need}$ and $\text{Request} \le \text{Available}$.
-  - Evaluates safety on a tentative state.
-  - Demonstrates atomic grant or safe rollback.
-- **DFRR Research Prototype**:
-  - Models a two-tier resource architecture: Normal Available Pool + Reserved Pool.
-  - Demonstrates how reserved buffers unblock stalled bottleneck processes.
-- **Side-by-Side Comparison**: Live benchmarking (median execution time, comparisons, outcome) comparing Banker's Algorithm vs DFRR.
-- **Preloaded Academic Library**: 1-click loading of scenarios **A through F** (including the official SLA sample and Silberschatz 5-process benchmark).
+The application provides a compact, wireframe-faithful layout structured into 10 numbered modules:
+
+### Left Column: Inputs & Actions
+1. **Configuration**: Set process count ($n$) and resource count ($m$) with dynamic matrix generation.
+2. **Allocation Matrix (editable)**: Current resource instances held by each process ($n \times m$).
+3. **Maximum Matrix (editable)**: Peak resource claims declared by each process ($n \times m$).
+4. **Available Vector (editable)**: Currently free, unallocated instances of each resource type ($m$).
+5. **Actions**:
+   - `Calculate Need`: Computes and displays the read-only Need Matrix with full validation.
+   - `Run Safety Check`: Validates inputs, executes the safety algorithm, updates system status, and produces the execution trace.
+   - `Reset`: Restores default $3 \times 3$ values and clears previous execution traces.
+
+### Right Column: Outputs & Trace
+6. **Need Matrix (calculated, read-only)**: Dynamic display of remaining requirements ($\text{Need} = \text{Maximum} - \text{Allocation}$).
+7. **System Status**: High-visibility status indicator (`SAFE` in green or `UNSAFE` in red).
+8. **Safe Sequence**: Interactive ordered sequence badges ($P0 \to P1 \to P2$) or clear notice if no sequence exists.
+9. **Step-by-Step Trace**: Table showing decision step, candidate process, eligibility check (`yes`/`no`), and resulting Work vector.
+10. **Message Line**: Context-aware status notification (red for input validation errors, green for success).
 
 ---
 
 ## 3. Technology Stack
 
-- **Language**: Python 3.11+
-- **Web Dashboard**: Streamlit
-- **Data & Matrix Computations**: NumPy & Pandas
-- **Interactive Visualizations**: Plotly Express & Plotly Graph Objects
-- **Automated Testing Suite**: Pytest
-- **Platform**: Cross-platform (optimized for Windows 10/11)
+- **Python 3.11+**
+- **Streamlit**: Web interface & interactive state management
+- **NumPy & Pandas**: Matrix operations & data tables
+- **Pytest**: Automated test suite
 
 ---
 
-## 4. Project Folder Structure
+## 4. Quick-Start Guide (Windows)
 
-```
-resource-allocation-simulator/
-├── app.py                     # Main interactive Streamlit web dashboard
-├── algorithms/                # Core independent algorithm logic
-│   ├── __init__.py
-│   ├── banker.py              # Banker's safety algorithm & safe sequence generator
-│   ├── resource_request.py    # Resource-request evaluation & rollback engine
-│   └── dfrr.py                # Deadlock-Free Resource Reservation prototype
-├── utils/                     # Supporting utilities and definitions
-│   ├── __init__.py
-│   ├── validation.py          # Input validation rules V1 through V7
-│   ├── examples.py            # Preloaded academic scenarios A through F
-│   └── metrics.py             # Performance counters, complexity & benchmarks
-├── tests/                     # Comprehensive automated unit tests (24 tests)
-│   ├── __init__.py
-│   ├── test_banker.py         # Banker's safety checks (TC-01 to TC-06, TC-13)
-│   ├── test_resource_request.py # Request evaluation & rollback correctness
-│   ├── test_dfrr.py           # DFRR accounting & unblocking invariant tests
-│   └── test_validation.py     # Validation rules V1-V7 & edge cases E1-E10
-├── docs/                      # Academic reports & documentation
-│   ├── user_guide.md          # User manual for students and faculty
-│   ├── algorithm_explanation.md # Mathematical formulas & SLA worked sample
-│   └── research_comparison.md # 5-paper synthesis & DFRR analysis
-├── requirements.txt           # Python dependency specifications
-├── run_simulator.bat          # 1-click Windows launcher batch script
-└── README.md                  # Project overview and instructions
-```
-
----
-
-## 5. Installation & Execution Guide (Windows)
-
-### Prerequisites:
-- Windows 10/11 with Python 3.10+ installed.
-
-### Option A: 1-Click Launch (Recommended for Windows)
-Simply double-click:
-```
+### Option A: 1-Click Launch (Recommended)
+Double-click:
+```cmd
 run_simulator.bat
 ```
-This batch file will automatically verify dependencies and open the application in your default web browser at `http://localhost:8501`.
 
-### Option B: Manual Command Line Launch
+### Option B: Command Line Launch
 1. Open PowerShell or Command Prompt in the project folder:
    ```powershell
    cd c:\Users\Yash\Desktop\resource-allocation-simulator
    ```
 
-2. *(Optional)* Create and activate a Python virtual environment:
-   ```powershell
-   python -m venv venv
-   .\venv\Scripts\Activate.ps1
-   ```
-
-3. Install required packages:
+2. Install dependencies:
    ```powershell
    pip install -r requirements.txt
    ```
 
-4. Launch the Streamlit application:
+3. Launch the Streamlit application:
    ```powershell
    streamlit run app.py
    ```
 
-5. Open your browser to:
+4. Open your browser at:
    ```
    http://localhost:8501
    ```
 
 ---
 
+## 5. Sample Default Execution
+
+### Initial Inputs:
+- **Processes ($n$)**: 3 ($P0, P1, P2$)
+- **Resources ($m$)**: 3 ($R0, R1, R2$)
+- **Allocation**:
+  $$P0: [1, 0, 1], \quad P1: [1, 1, 0], \quad P2: [1, 1, 1]$$
+- **Maximum**:
+  $$P0: [2, 1, 1], \quad P1: [1, 2, 2], \quad P2: [2, 1, 2]$$
+- **Available**:
+  $$R0: 1, \quad R1: 1, \quad R2: 1$$
+
+### Calculated Output:
+- **Need Matrix**:
+  $$P0: [1, 1, 0], \quad P1: [0, 1, 2], \quad P2: [1, 0, 1]$$
+- **System Status**: **SAFE**
+- **Safe Sequence**: **$P0 \to P1 \to P2$**
+- **Trace Progression**:
+  - Step 1: $P0 \implies \text{Need} \le \text{Work} \implies \text{Work after} = (2, 1, 2)$
+  - Step 2: $P1 \implies \text{Need} \le \text{Work} \implies \text{Work after} = (3, 2, 2)$
+  - Step 3: $P2 \implies \text{Need} \le \text{Work} \implies \text{Work after} = (4, 3, 3)$
+
+---
+
 ## 6. Running Automated Tests
 
-The project includes 24 automated unit tests verifying input validation, edge cases, Banker's safety checking, resource-request rollback, and DFRR invariants.
-
-Run all tests from the project root:
+Run the automated test suite with:
 ```powershell
 python -m pytest tests -v
 ```
-
-### Expected Output:
-```
-tests/test_banker.py::test_tc01_need_calculation PASSED
-tests/test_banker.py::test_tc02_safe_state_sla_sample PASSED
-tests/test_banker.py::test_tc03_resource_conservation PASSED
-tests/test_banker.py::test_tc04_unsafe_no_eligible_process PASSED
-tests/test_banker.py::test_tc05_unsafe_stall_after_progress PASSED
-tests/test_banker.py::test_tc06_single_process_case PASSED
-tests/test_banker.py::test_tc13_order_independence_of_verdict PASSED
-tests/test_banker.py::test_multiple_valid_safe_sequences PASSED
-tests/test_banker.py::test_silberschatz_benchmark PASSED
-tests/test_dfrr.py::test_dfrr_unblocks_stalled_system PASSED
-tests/test_dfrr.py::test_dfrr_resource_accounting_invariant PASSED
-tests/test_dfrr.py::test_dfrr_stall_when_reserve_pool_insufficient PASSED
-tests/test_dfrr.py::test_dfrr_total_mismatch_raises_error PASSED
-tests/test_resource_request.py::test_request_granted_safe PASSED
-tests/test_resource_request.py::test_request_denied_exceeds_need PASSED
-tests/test_resource_request.py::test_request_must_wait_insufficient_available PASSED
-tests/test_resource_request.py::test_request_denied_due_to_unsafe_tentative_state PASSED
-tests/test_validation.py::test_v1_invalid_process_and_resource_count PASSED
-tests/test_validation.py::test_v2_negative_values_rejected PASSED
-tests/test_validation.py::test_v3_dimension_mismatch PASSED
-tests/test_validation.py::test_v4_nan_or_malformed_input PASSED
-tests/test_validation.py::test_v5_allocation_exceeds_maximum PASSED
-tests/test_validation.py::test_v6_maximum_exceeds_total_instances PASSED
-tests/test_validation.py::test_request_validation_conditions PASSED
-============================== 24 passed in 0.30s ==============================
-```
-
----
-
-## 7. Example Execution Walkthrough (SLA-1 / SLA-2 Official Sample)
-
-### Input Data:
-- Processes: $P_0, P_1, P_2$ ($n=3$)
-- Resources: $R_1, R_2, R_3$ ($m=3$)
-- **Allocation Matrix**:
-  $$P_0: [1, 0, 1], \quad P_1: [1, 1, 0], \quad P_2: [1, 1, 1]$$
-- **Maximum Matrix**:
-  $$P_0: [2, 1, 1], \quad P_1: [1, 2, 2], \quad P_2: [2, 1, 2]$$
-- **Available Vector**:
-  $$\text{Available}: [1, 1, 1]$$
-
-### Execution & Output:
-1. **Need Matrix**:
-   $$P_0: [1, 1, 0], \quad P_1: [0, 1, 2], \quad P_2: [1, 0, 1]$$
-2. **Work Progression**:
-   - Initial Work: `(1, 1, 1)`
-   - Step 1: $P_0$ satisfies $\text{Need} \le \text{Work}$. Runs, finishes, releases `(1, 0, 1)`. Work becomes `(2, 1, 2)`.
-   - Step 2: $P_1$ satisfies $\text{Need} \le \text{Work}$. Runs, finishes, releases `(1, 1, 0)`. Work becomes `(3, 2, 2)`.
-   - Step 3: $P_2$ satisfies $\text{Need} \le \text{Work}$. Runs, finishes, releases `(1, 1, 1)`. Work becomes `(4, 3, 3)`.
-3. **Verdict**:
-   - Status: **SAFE**
-   - Safe Sequence: **$P_0 \to P_1 \to P_2$**
-   - Final Work: `(4, 3, 3)` (conserves $\sum \text{Allocations} + \text{Available}$)
-
----
-
-## 8. Research Extension: DFRR Prototype
-
-### Research Source:
-- **Botlagunta, M. D., Agrawal, S., & Rajeswara Rao, R. (2022)**. *"A Novel Resource Management Technique for Deadlock-Free Systems."* *International Journal of Information Technology*, 14(2), 627–635.
-
-### Prototype Assumptions & Academic Claims:
-- This is an **educational research-inspired prototype**.
-- The physical capacity is partitioned into:
-  $$\text{Total} = \text{Allocated} + \text{Available}_{\text{norm}} + \text{Reserved}$$
-- When available normal resources are insufficient for any process to progress, the system loans from the reserved buffer to the candidate with the smallest deficit.
-- We document honestly that reserving resources reduces the immediate unreserved capacity for standard processes; hence, DFRR is a specialized technique rather than an unqualified replacement for Banker's Algorithm.
-
----
-
-## 9. Limitations & Future Scope
-
-### Limitations:
-1. **Static Maximum Claims**: Banker's Algorithm assumes processes declare maximum claims up front, which may not hold in unpredictable real-time software.
-2. **Centralized Model**: Assumes a single centralized scheduler rather than distributed nodes.
-3. **Synthetic Workloads**: Analyzes simulated process states rather than hooking into real Linux/Windows kernel threads.
-
-### Future Scope:
-1. Implementing hierarchical allocators for distributed clusters (*Madduri & Finkel, 1984*).
-2. Integrating runtime graph caching for $O(\log n)$ safety checks (*Finkel & Madduri, 1987*).
-3. Dynamic max claim updating based on control flow tree decomposition (*Lang, 1999*).
+All unit tests verify Need calculation, safe/unsafe state detection, boundary conditions, and validation rules.

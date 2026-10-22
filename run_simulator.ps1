@@ -5,9 +5,8 @@ if (-not (Test-Path $pyExe)) {
 }
 
 Write-Host "=====================================================================" -ForegroundColor Cyan
-Write-Host "  RESOURCE ALLOCATION SIMULATOR - DEADLOCK AVOIDANCE" -ForegroundColor Green
-Write-Host "  Operating Systems SLA-2 Project (SYCM3, Semester III)" -ForegroundColor Yellow
-Write-Host "  Shah & Anchor Kutchhi Engineering College" -ForegroundColor Yellow
+Write-Host "  RESOURCE ALLOCATION SIMULATOR - BANKER'S ALGORITHM" -ForegroundColor Green
+Write-Host "  Deadlock Avoidance Interactive Simulator" -ForegroundColor Yellow
 Write-Host "=====================================================================" -ForegroundColor Cyan
 Write-Host ""
 

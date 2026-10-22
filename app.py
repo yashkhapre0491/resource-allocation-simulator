@@ -15,6 +15,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import time
 import copy
+from typing import List, Dict, Any, Optional, Tuple
 
 from algorithms.banker import (
     compute_need_matrix,
